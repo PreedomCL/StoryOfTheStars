@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="background-color:cornflowerblue;">
+    <canvas id="canvas" width="1000" height="600" oncontextmenu="return false;" style="background-color: black;"></canvas>
+    <p id="infobox1">infobox1</p>
+    <script>
+        var elem = document.getElementById("canvas");
+        function openFullscreen() {
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+          } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE/Edge */
+            elem.msRequestFullscreen();
+          }
+        }
+    </script>
+
+    <script src="input.js"></script>
+    <script src="entities.js"></script>
+    <script src="tiles.js"></script>
+    <script src="assets.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
