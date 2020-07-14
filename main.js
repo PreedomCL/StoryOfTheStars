@@ -4,13 +4,13 @@ let tps = 30;
 
 const cvs = document.getElementById('canvas');
 const ctx = cvs.getContext('2d');
+const staticCtx = cvs.getContext('2d');
 const WIDTH = document.getElementById('canvas').width;
 const HEIGHT = document.getElementById('canvas').height;
 assets.init();
+
 tileManager.generateMap(10, 10, 10);
-
-entityManager.add(new FeildBerries(0, 0));
-
+entityManager.add(new FeildBerries(-49, 0));
 
 
 //GameCamera
@@ -58,11 +58,48 @@ cvs.onwheel = function (event){
     }
 }
 
+
+class Player {
+    id;
+    name;
+    resources = [
+        [0,0,0],
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
+    ];
+
+    constructor(id, name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    tick() {
+
+    }
+
+    render() {
+        staticCtx.fillStyle = 'red';
+        staticCtx.font = "italic 10px sans-serif";
+        staticCtx.textAlign = "center";
+        staticCtx.fillText("Hello my name is " + this.name + " and my id is: " + this.id, 0, 20);
+    }
+}
+let players = [new Player(0, "Carl"), new Player(1, "John")];
+
+
 function render() {
     ctx.clearRect(-10000,-10000,20000,20000);
     ctx.setTransform(gameCamera.scale, 0, 0, gameCamera.scale, gameCamera.xOffset*gameCamera.scale, gameCamera.yOffset*gameCamera.scale);
+    
+    
+
     tileManager.render();
     entityManager.render();
+    players[1].render();
+
+    ctx.fillStyle = 'purple';
+    ctx.fillRect(0, 0, 1, 1);
 }
 
 function tick(){

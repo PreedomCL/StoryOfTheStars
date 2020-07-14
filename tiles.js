@@ -19,7 +19,7 @@ let tileManager = {
     generateMap: function(width, height, difficulty) {
         for(let x = 0; x < width; x++){
             for(let y = 0; y < height; y++){
-                this.add(new FieldTile((x * 49) - (y * 49), (y * 28.87) + (x * 28.87)));
+                this.add(new FieldTile((x * 49) - (y * 49) - 49, (y * 28.87) + (x * 28.87)));
             }
         }
     }
