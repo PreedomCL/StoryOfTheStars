@@ -34,13 +34,17 @@ class Entity {
     height;
     size;
     texture;
-    constructor(x, y, size, texture) {
+    name;
+
+    info = [];
+    constructor(x, y, size, texture, name) {
         this.x = x;
         this.y = y;
         this.width = size;
         this.height = size * .5774;
         this.active = true;
         this.texture = texture;
+        this.name = name;
     };
 
     render() {
@@ -68,20 +72,27 @@ class Entity {
 ////////STATIC////////
 
 class StaticEntity extends Entity {
-    constructor(x, y, size, texture) {
-        super(x, y, size, texture);
+    constructor(x, y, size, texture, name) {
+        super(x, y, size, texture, name);
     }
 }
 
 class Resource extends StaticEntity {
-    constructor(x, y, size, texture) {
-        super(x, y, size, texture);
+    constructor(x, y, size, texture, name) {
+        super(x, y, size, texture, name);
     }
 }
 
 class FeildBerries extends Resource {
+    quantity = 1000;
     constructor(x, y) {
-        super(x, y, 100, assets.textures.entity.static.resources.fields.berries_1);
+        super(x, y, 100, assets.textures.entity.static.resources.fields.berries_1, "Berries");
+    }
+
+    tick() {
+        this.quantity --;
+        this.info[0] = {property: "Quantity", value: this.quantity};
+        this.active = (this.quantity > 0)? true: false;
     }
 }
 
