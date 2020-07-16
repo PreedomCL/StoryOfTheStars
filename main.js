@@ -7,7 +7,6 @@ const ctx = cvs.getContext('2d');
 const WIDTH = document.getElementById('canvas').width;
 const HEIGHT = document.getElementById('canvas').height;
 
-let currentPlayer = 0;
 assets.init();
 
 tileManager.generateMap(10, 10, 10);
@@ -51,7 +50,7 @@ cvs.onwheel = function (event){
     let zoomIntensity = 0.2;
     let zoom = Math.exp(wheel*zoomIntensity);
     
-    if(gameCamera.scale * zoom < 3 && gameCamera.scale * zoom > 0.5) {
+    if(gameCamera.scale * zoom < 3 && gameCamera.scale * zoom > 0.25) {
         gameCamera.xOffset += (mousex/(gameCamera.scale*zoom) - mousex/gameCamera.scale);
         gameCamera.yOffset += (mousey/(gameCamera.scale*zoom) - mousey/gameCamera.scale);
         
@@ -77,7 +76,10 @@ class Player {
     }
 
     tick() {
-
+        if(mouseListener.justPressedButton[0]) {
+            console.log("Hello");
+            this.selectedTile = null;
+        }
     }
 
     render() {
@@ -103,7 +105,7 @@ class Player {
 
             ctx.fillText("Contains:", 0, 515);
             for(let i = 0; i < dependantInfo.length; i++) {
-                ctx.fillText(dependantInfo[i], 0, 530 + (15*i));
+                ctx.fillText(dependantInfo[i], 10, 530 + (15*i));
             }
             
         }
@@ -111,8 +113,17 @@ class Player {
     ctx.setTransform(gameCamera.scale, 0, 0, gameCamera.scale, gameCamera.xOffset*gameCamera.scale, gameCamera.yOffset*gameCamera.scale);
     }
 }
+let currentPlayer = 0;
 let players = [new Player(0, "Carl"), new Player(1, "John")];
 
+function nextTurn() {
+    players[currentPlayer].selectedTile = null;
+    currentPlayer = (currentPlayer+1 == players.length)? 0 : currentPlayer+1;
+    tileManager.tiles.forEach(element => {
+        element.selected = false;
+    })
+    
+}
 
 
 
@@ -135,8 +146,11 @@ function render() {
 
 function tick(){
     gameCamera.calculateOffset();
+    players[currentPlayer].tick();
     entityManager.tick();
-    tileManager.tick();
+    tileManager.tick();  
+    
+
     mouseListener.tick();
     keyListener.tick();
 }

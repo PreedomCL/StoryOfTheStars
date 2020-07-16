@@ -36,6 +36,10 @@ class Tile {
     dependents = [];
 
     selected = false;
+    positionChange = {
+        lastX: 0,
+        lastY: 0,
+    };
     constructor(x, y, texture, id, type){
         this.x = x;
         this.y = y;
@@ -50,7 +54,7 @@ class Tile {
 
         ctx.drawImage(this.texture, this.x, this.y, this.width, this.texture.naturalHeight * (this.width/this.texture.naturalWidth) + 2);
 
-        if(this.isHovering() || this.selected){
+        if(this.selected){
             ctx.drawImage(assets.textures.misc.base, this.x, this.y, this.width, assets.textures.misc.base.naturalHeight * (this.width/assets.textures.misc.base.naturalWidth) + 2);
         }
 
@@ -60,8 +64,15 @@ class Tile {
     }
 
     tick() {
+
         if(this.isHovering() && mouseListener.justPressedButton[0]){
+            this.positionChange.lastX = gameCamera.xOffset;
+            this.positionChange.lastY = gameCamera.yOffset;
+        }
+        
+        if(this.isHovering() && mouseListener.buttonUp[0] && (this.positionChange.lastX == gameCamera.xOffset && this.positionChange.lastY == gameCamera.yOffset)){
             this.selected = !this.selected;
+            this.mouseDown = false;
             players[currentPlayer].selectedTile = (this.selected)? this : null;
         }else if(mouseListener.justPressedButton[0]) {
             this.selected = false;

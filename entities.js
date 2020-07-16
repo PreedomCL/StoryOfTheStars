@@ -84,16 +84,11 @@ class Resource extends StaticEntity {
 }
 
 class FeildBerries extends Resource {
-    quantity = 1000;
     constructor(x, y) {
         super(x, y, 100, assets.textures.entity.static.resources.fields.berries_1, "Berries");
     }
 
-    tick() {
-        this.quantity --;
-        this.info[0] = {property: "Quantity", value: this.quantity};
-        this.active = (this.quantity > 0)? true: false;
-    }
+    tick() {}
 }
 
 ////////DYNAMIC////////

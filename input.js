@@ -30,6 +30,7 @@ let mouseListener = {
     mouseY: 0,
     mouseD: false,
     button: [],
+    buttonUp: [],
     justPressedButton: [],
     heldButton: [],
     
@@ -45,7 +46,8 @@ let mouseListener = {
     mouseUp: function(event){
         mouseListener.mouseD = false;
         mouseListener.button[event.button] = false;
-        mouseListener.tick();
+        mouseListener.buttonUp[event.button] = true;
+        //mouseListener.tick();
     },
     tick: function(){
         for(let i = 0; i < this.button.length; i++) {
@@ -58,6 +60,10 @@ let mouseListener = {
 			if(!this.heldButton[i] && this.button[i]) {
 				this.justPressedButton[i] = true;
             }
+        }
+        
+        for(let i = 0; i < this.buttonUp.length; i++) {
+            this.buttonUp[i] = false;
         }
     }
 }
