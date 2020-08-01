@@ -14,6 +14,8 @@ tileManager.generateMap(10, 10, 10);
 tileManager.tiles[0].addResource(new FeildBerries());
 tileManager.tiles[0].resource.addStructure(new FeildForaging(1));
 
+uiManager.add(new UIButton(0, 0, 100, 100));
+
 //GameCamera
 let gameCamera = {
     xOffset: 500,
@@ -131,7 +133,7 @@ function render() {
 
     tileManager.render();
     entityManager.render();
-    
+    uiManager.render();
 
     ctx.fillStyle = 'purple';
     ctx.fillRect(0, 0, 1, 1);
@@ -143,7 +145,8 @@ function tick(){
     gameCamera.calculateOffset();
     players[currentPlayer].tick();
     entityManager.tick();
-    tileManager.tick();  
+    tileManager.tick();
+    uiManager.tick();  
     
 
     mouseListener.tick();

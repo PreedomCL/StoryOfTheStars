@@ -64,13 +64,19 @@ class Tile {
     }
 
     tick() {
+        let points = [
+            {x:this.x + 49, y:this.y},
+            {x:this.x + 98, y:this.y + 28.87},
+            {x:this.x + 49, y:this.y + 57.74},
+            {x:this.x, y:this.y + 28.87}
+        ];
 
-        if(this.isHovering() && mouseListener.justPressedButton[0]){
+        if(isHovering(points) && mouseListener.justPressedButton[0]){
             this.positionChange.lastX = gameCamera.xOffset;
             this.positionChange.lastY = gameCamera.yOffset;
         }
         
-        if(this.isHovering() && mouseListener.buttonUp[0] && (this.positionChange.lastX == gameCamera.xOffset && this.positionChange.lastY == gameCamera.yOffset)){
+        if(isHovering(points) && mouseListener.buttonUp[0] && (this.positionChange.lastX == gameCamera.xOffset && this.positionChange.lastY == gameCamera.yOffset)){
             this.selected = !this.selected;
             this.mouseDown = false;
             players[currentPlayer].selectedTile = (this.selected)? this : null;
@@ -86,36 +92,6 @@ class Tile {
             this.resource.tick();
         }
         
-    }
-
-    isHovering() {
-        let collision = false;
-        let points = [
-            {x:0, y:0},
-            {x:0, y:0},
-            {x:0, y:0},
-            {x:0, y:0}
-        ];
-
-        points[0].x = this.x + 49;
-        points[0].y = this.y;
-        points[1].x = this.x + 98;
-        points[1].y = this.y + 28.87;
-        points[2].x = this.x + 49;
-        points[2].y = this.y + 57.74;
-        points[3].x = this.x;
-        points[3].y = this.y + 28.87;
-
-        for(let i = 0; i<points.length; i++){
-            let vc = points[i];
-            let vn = (i+1 == points.length)? points[0] : points[i+1];
-            let px = (mouseListener.mouseX - (gameCamera.xOffset * gameCamera.scale)) / gameCamera.scale;
-            let py = (mouseListener.mouseY - (gameCamera.yOffset * gameCamera.scale)) / gameCamera.scale;
-            if (((vc.y >= py && vn.y < py) || (vc.y < py && vn.y >= py)) && (px < (vn.x-vc.x)*(py-vc.y) / (vn.y-vc.y)+vc.x)) {
-                collision = !collision;
-            }
-        }
-        return(collision);
     }
 
     addResource(resource) {
