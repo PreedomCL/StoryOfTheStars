@@ -90,8 +90,7 @@ class Tile {
             }
 
             this.resource.tick();
-        }
-        
+        } 
     }
 
     addResource(resource) {

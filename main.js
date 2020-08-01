@@ -12,9 +12,6 @@ assets.init();
 tileManager.generateMap(10, 10, 10);
 
 tileManager.tiles[0].addResource(new FeildBerries());
-tileManager.tiles[0].resource.addStructure(new FeildForaging(1));
-
-uiManager.add(new UIButton(0, 0, 100, 100));
 
 //GameCamera
 let gameCamera = {
@@ -66,6 +63,7 @@ class Player {
     id;
     name;
     selectedTile;
+    buildButton;
     resources = [
         [0,0,0],
         [0,0,0],
@@ -81,6 +79,16 @@ class Player {
     tick() {
         if(mouseListener.justPressedButton[0]) {
             this.selectedTile = null;
+        }
+        if(this.selectedTile != null) {
+            if(this.selectedTile.resource.name == "Berries") {
+                this.buildButton = new UIButton(15, 15, 15, 16, function(){
+                    this.selectedTile.resource.addStructure(new FeildForaging(players[currentPlayer]));
+                });
+            }
+        }
+        if(this.buildButton != null) {
+            this.buildButton.tick();
         }
     }
 
@@ -107,6 +115,9 @@ class Player {
                 ctx.fillText(dependantInfo, 10, 530);
             }
             
+        }
+        if(this.buildButton != null) {
+            this.buildButton.render();
         }
 
     ctx.setTransform(gameCamera.scale, 0, 0, gameCamera.scale, gameCamera.xOffset*gameCamera.scale, gameCamera.yOffset*gameCamera.scale);
