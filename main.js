@@ -11,7 +11,8 @@ assets.init();
 
 tileManager.generateMap(10, 10, 10);
 
-tileManager.tiles[0].addDependent(new FeildBerries(-49, 0));
+tileManager.tiles[0].addResource(new FeildBerries());
+tileManager.tiles[0].resource.addStructure(new FeildForaging(1));
 
 //GameCamera
 let gameCamera = {
@@ -77,7 +78,6 @@ class Player {
 
     tick() {
         if(mouseListener.justPressedButton[0]) {
-            console.log("Hello");
             this.selectedTile = null;
         }
     }
@@ -93,19 +93,16 @@ class Player {
         if(this.selectedTile != (null || undefined)) {
             ctx.fillText(`Selected Tile: ${this.selectedTile.id}, Type: ${this.selectedTile.type}`, 0, 500);
 
-            let dependantInfo = [];
-            for(let i = 0; i < this.selectedTile.dependents.length; i++){
-                dependantInfo[i] = this.selectedTile.dependents[i].name + "(";
-                for(let j = 0; j < this.selectedTile.dependents[i].info.length; j++){
-                    dependantInfo[i] += this.selectedTile.dependents[i].info[j].property;
-                    dependantInfo[i] += ": " + this.selectedTile.dependents[i].info[j].value + ", ";
+            if(this.selectedTile.resource != null){
+                let dependantInfo;
+                dependantInfo = this.selectedTile.resource.name + "(";
+                for(let j = 0; j < this.selectedTile.resource.info.length; j++){
+                    dependantInfo += this.selectedTile.resource.info[j].property;
+                    dependantInfo += ": " + this.selectedTile.resource.info[j].value + ", ";
                 }
-                dependantInfo[i] += ")";
-            }
-
-            ctx.fillText("Contains:", 0, 515);
-            for(let i = 0; i < dependantInfo.length; i++) {
-                ctx.fillText(dependantInfo[i], 10, 530 + (15*i));
+                dependantInfo += ")";
+                ctx.fillText("Contains:", 0, 515);
+                ctx.fillText(dependantInfo, 10, 530);
             }
             
         }
@@ -124,8 +121,6 @@ function nextTurn() {
     })
     
 }
-
-
 
 function render() {
     ctx.clearRect(-10000,-10000,20000,20000);

@@ -33,7 +33,7 @@ class Tile {
     texture;
     type;
 
-    dependents = [];
+    resource;
 
     selected = false;
     positionChange = {
@@ -58,8 +58,8 @@ class Tile {
             ctx.drawImage(assets.textures.misc.base, this.x, this.y, this.width, assets.textures.misc.base.naturalHeight * (this.width/assets.textures.misc.base.naturalWidth) + 2);
         }
 
-        for(let i = 0; i < this.dependents.length; i++){
-            this.dependents[i].render();
+        if(this.resource != null) {
+            this.resource.render();
         }
     }
 
@@ -78,17 +78,13 @@ class Tile {
             this.selected = false;
         }
 
-        for(let i = 0; i < this.dependents.length; i++){
-            let d = this.dependents[i];
-
-            if(!d.active){
-                this.dependents.splice(i, 1);
-                continue;
+        if(this.resource != null) {
+            if(!this.resource.active){
+                this.resource = null;
             }
 
-            d.tick();
+            this.resource.tick();
         }
-
         
     }
 
@@ -122,11 +118,15 @@ class Tile {
         return(collision);
     }
 
-    addDependent(dependent) {
-        this.dependents[this.dependents.length] = dependent;
+    addResource(resource) {
+        this.resource = resource;
+        this.resource.tile = this;
+
+        this.resource.x = this.x;
+        this.resource.y = this.y;
     }
-    
 }
+    
 
 class FieldTile extends Tile {
     constructor(x, y, id) {

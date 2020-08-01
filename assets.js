@@ -2,26 +2,17 @@ let assets = {
     textures: {
         entity: {
             static: {
-                resources: {
-                    fields: {
-                        berries_1: new Image(),
-                        init: function() {
-                            this.berries_1.src = 'res/textures/entity_static_resources_fields_berries_1.gif';
-                        }
-                    },
+                fields: {
+                    berries_1: new Image(),
+                    foraging_1: new Image(),
                     init: function() {
-                        this.fields.init();
-                    }
-                },
-                structures: {
-                    init: function() {
-
+                        this.berries_1.src = 'res/textures/entity_static_fields_berries_1.gif';
+                        this.foraging_1.src = 'res/textures/entity_static_fields_foraging_1.gif';
                     }
                 },
                 init: function() {
-                    this.resources.init();
-                    this.structures.init();
-                }
+                    this.fields.init();
+                },
             },
             dynamic: {
                 init: function() {
