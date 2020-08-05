@@ -32,8 +32,13 @@ class Tile {
     id;
     texture;
     type;
+    owner = null;
+    protected = false;
+
+    ui = [];
 
     resource;
+    structure;
 
     selected = false;
     positionChange = {
@@ -52,8 +57,11 @@ class Tile {
 
     render() {
 
+        if(this.owner != players[currentPlayer] && this.owner != null) {
+            ctx.filter = "grayscale(50%)";
+        }
         ctx.drawImage(this.texture, this.x, this.y, this.width, this.texture.naturalHeight * (this.width/this.texture.naturalWidth) + 2);
-
+        
         if(this.selected){
             ctx.drawImage(assets.textures.misc.base, this.x, this.y, this.width, assets.textures.misc.base.naturalHeight * (this.width/assets.textures.misc.base.naturalWidth) + 2);
         }
@@ -61,6 +69,10 @@ class Tile {
         if(this.resource != null) {
             this.resource.render();
         }
+        if(this.structure != null) {
+            this.structure.render();
+        }
+        ctx.filter = "none";
     }
 
     tick() {
@@ -76,21 +88,37 @@ class Tile {
             this.positionChange.lastY = gameCamera.yOffset;
         }
         
-        if(isHovering(points) && mouseListener.buttonUp[0] && (this.positionChange.lastX == gameCamera.xOffset && this.positionChange.lastY == gameCamera.yOffset)){
+        if(isHovering(points) && mouseListener.buttonUp[0] && !uiManager.hoveringOverUi && (this.positionChange.lastX == gameCamera.xOffset && this.positionChange.lastY == gameCamera.yOffset)){
             this.selected = !this.selected;
-            this.mouseDown = false;
             players[currentPlayer].selectedTile = (this.selected)? this : null;
-        }else if(mouseListener.justPressedButton[0]) {
+        }else if(mouseListener.buttonUp[0] && !uiManager.hoveringOverUi) {
             this.selected = false;
         }
 
         if(this.resource != null) {
             if(!this.resource.active){
                 this.resource = null;
+            }else {
+                this.resource.tick();
             }
+        }
 
-            this.resource.tick();
-        } 
+        if(this.structure != null) {
+            if(!this.structure.active) {
+                this.structure = null;
+            }else {
+                this.structure.tick();
+            }
+        }
+    }
+
+    onNextTurn() {
+        if(this.resource != null) {
+            this.resource.onNextTurn();
+        }
+        if(this.structure != null) {
+            this.structure.onNextTurn();
+        }
     }
 
     addResource(resource) {
@@ -99,6 +127,16 @@ class Tile {
 
         this.resource.x = this.x;
         this.resource.y = this.y;
+
+    }
+    
+    addStructure(structure) {
+        this.structure = structure;
+        this.structure.tile = this;
+
+        this.structure.x = this.x;
+        this.structure.y = this.y;
+
     }
 }
     

@@ -35,9 +35,9 @@ class Entity {
     size;
     texture;
     name;
-    tags;
+    tags = [];
 
-    info = [];
+    data = [];
     constructor(x, y, size, texture, name, tags) {
         this.x = x;
         this.y = y;
@@ -82,11 +82,19 @@ class StaticEntity extends Entity {
 class Resource extends StaticEntity {
     structure;
     tile;
-    constructor(x, y, size, texture, name, tags) {
+    resources = 10;
+    id;
+    ui = [new UIButton(10, 50, 20, 20, function(){
+        players[currentPlayer].selectedTile.addStructure(new FeildForaging());
+        players[currentPlayer].selectedTile.owner = players[currentPlayer];
+        this.active = false;
+    })];
+    constructor(x, y, size, texture, name, id, tags) {
         super(x, y, size, texture, name, tags);
+        this.id = id;
 
     }
-
+    
     render() {
         if(keyListener.key[66]){
             ctx.drawImage(base, (this.x+gameCamera.xOffset) * gameCamera.zoom, (this.y-(base.naturalHeight * (this.width/base.naturalWidth))+this.height+gameCamera.yOffset) * gameCamera.zoom, this.width * gameCamera.zoom, base.naturalHeight * (this.width/base.naturalWidth));
@@ -99,50 +107,56 @@ class Resource extends StaticEntity {
             ctx.fillStyle = "black";
             ctx.strokeRect(this.x+gameCamera.xOffset, this.y+gameCamera.yOffset, this.width, this.height);
         }
-        
-        if(this.structure != null) {
-            this.structure.render();
-            let structureInfo = this.structure.name + "(";
-            for (let i = 0; i < this.structure.info.length; i++) {
-                structureInfo += this.structure.info[i].property + ": ";
-                structureInfo += this.structure.info[i].value + ", ";
-            }
-            structureInfo += ")"
-            this.info[0] = {
-                property: "Structure",
-                value: structureInfo
-            }
-        }
-    };
-
-    addStructure(structure) {
-        this.structure = structure;
-        this.structure.resource = this;
-
-        this.structure.x = this.x;
-        this.structure.y = this.y;
     }
+
+    tick() {}
+
+    onNextTurn() {}
+
+   
 }
 
 class FeildBerries extends Resource {
     constructor() {
-        super(0, 0, 100, assets.textures.entity.static.fields.berries_1, "Berries");
+        super(0, 0, 100, assets.textures.entity.static.fields.berries_1, "Berries", 0);
     }
+
+    tick() {
+        this.data[0] = {property: "Resources", value: this.resources};
+        if(this.resources <= 0) {
+            this.active = false;
+        }
+    }
+    
 
 }
 
 class Structure extends StaticEntity {
-    owner;
-    resource;
-    constructor(x, y, size, texture, name, owner, tags) {
+    tile;
+    ui = [new UIButton(10, 80, 20, 20, function(){
+        players[currentPlayer].selectedTile.structure.active = false;
+        players[currentPlayer].selectedTile.resource.ui[0].active = true;
+        players[currentPlayer].selectedTile.owner = players[currentPlayer].selectedTile.protected? players[currentPlayer] : null;
+    })];
+    constructor(x, y, size, texture, name, tags) {
         super(x, y, size, texture, name, tags);
-        this.owner = owner;
+    }
+
+    onNextTurn() {
+
     }
 }
 
 class FeildForaging extends Structure {
-    constructor(owner) {
-        super(0, 0, 100, assets.textures.entity.static.fields.foraging_1, "Foraging", owner);
+    constructor() {
+        super(0, 0, 100, assets.textures.entity.static.fields.foraging_1, "Foraging");
+    }
+
+    onNextTurn() {
+        if(this.tile.resource != null && this.tile.resource.id == 0) {
+            this.tile.owner.resources[0][0] ++;
+            this.tile.resource.resources --;
+        }
     }
 }
 ////////DYNAMIC////////

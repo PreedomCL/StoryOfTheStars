@@ -15,10 +15,12 @@ let isHovering = function(points, transformed) {
 
 let uiManager = {
     elements: [],
+    hoveringOverUi: false,
     add: function(element) {
         this.elements[this.elements.length] = element;
     },
     tick() {
+        this.hoveringOverUi = false;
         for(let i = 0; i < this.elements.length; i++){
             let element = this.elements[i];
 
@@ -65,7 +67,10 @@ class UIButton {
     }
 
     tick() {
-        if(isHovering(this.points, false) && mouseListener.justPressedButton[0]) {
+        if(isHovering(this.points, false)) {
+            uiManager.hoveringOverUi = true;
+        }
+        if(isHovering(this.points, false) && mouseListener.buttonUp[0]) {
             this.trigger();
         }
     }

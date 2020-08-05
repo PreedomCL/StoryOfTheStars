@@ -12,6 +12,7 @@ assets.init();
 tileManager.generateMap(10, 10, 10);
 
 tileManager.tiles[0].addResource(new FeildBerries());
+uiManager.add(new UIButton(20, 540, 100, 40, nextTurn));
 
 //GameCamera
 let gameCamera = {
@@ -32,12 +33,12 @@ let gameCamera = {
             this.yOffset -= (this.lastY-mouseListener.mouseY)/this.scale;
             this.lastY = mouseListener.mouseY;
         }
-
-        // if(this.xOffset > 620) this.xOffset = 619;
-        // if(this.xOffset < -320) this.xOffset = -319;
-        // if(this.yOffset > 70) this.yOffset = 69;
-        // if(this.yOffset < -500) this.yOffset = -499;
         
+    },
+    resetOffset: function() {
+        this.xOffset = 500;
+        this.yOffset = 0;
+        this.scale = 1;
     }
 }
 cvs.onwheel = function (event){
@@ -63,7 +64,6 @@ class Player {
     id;
     name;
     selectedTile;
-    buildButton;
     resources = [
         [0,0,0],
         [0,0,0],
@@ -77,18 +77,27 @@ class Player {
     }
 
     tick() {
-        if(mouseListener.justPressedButton[0]) {
+        if(this.selectedTile != null && !this.selectedTile.selected) {
             this.selectedTile = null;
         }
-        if(this.selectedTile != null) {
-            if(this.selectedTile.resource.name == "Berries") {
-                this.buildButton = new UIButton(15, 15, 15, 16, function(){
-                    this.selectedTile.resource.addStructure(new FeildForaging(players[currentPlayer]));
-                });
+        if(this.selectedTile != null && (this.selectedTile.owner == this || this.selectedTile.owner == null)) { 
+            this.selectedTile.ui.forEach(element => {
+                if(element.active)
+                    element.tick();
+            })
+
+            if(this.selectedTile.resource != null) {
+                this.selectedTile.resource.ui.forEach(element => {
+                    if(element.active)
+                        element.tick();
+                })
             }
-        }
-        if(this.buildButton != null) {
-            this.buildButton.tick();
+            if(this.selectedTile.structure != null) {
+                this.selectedTile.structure.ui.forEach(element => {
+                    if(element.active)
+                        element.tick();
+                })
+            }
         }
     }
 
@@ -100,24 +109,53 @@ class Player {
         
         ctx.fillText("Hello my name is " + this.name + " and my id is: " + this.id, 0, 15);
         ctx.fillText(`Agricultural Resources: ${this.resources[0]} | Mining Resources: ${this.resources[1]} | Forestry Resources: ${this.resources[2]} | Technological Resources: ${this.resources[3]}`, 0, 30);
-        if(this.selectedTile != (null || undefined)) {
-            ctx.fillText(`Selected Tile: ${this.selectedTile.id}, Type: ${this.selectedTile.type}`, 0, 500);
-
+        if(this.selectedTile != null) {
+            ctx.fillText(`Selected Tile: ${this.selectedTile.id}, Type: ${this.selectedTile.type}, Owner: ${this.selectedTile.owner == null? "unowned": this.selectedTile.owner.name}`, 0, 500);
+            ctx.fillText("Contains:", 0, 515);
             if(this.selectedTile.resource != null){
-                let dependantInfo;
-                dependantInfo = this.selectedTile.resource.name + "(";
-                for(let j = 0; j < this.selectedTile.resource.info.length; j++){
-                    dependantInfo += this.selectedTile.resource.info[j].property;
-                    dependantInfo += ": " + this.selectedTile.resource.info[j].value + ", ";
+                let resourceData;
+                resourceData = this.selectedTile.resource.name + "(";
+                for(let j = 0; j < this.selectedTile.resource.data.length; j++){
+                    resourceData += this.selectedTile.resource.data[j].property;
+                    resourceData += ": " + this.selectedTile.resource.data[j].value + ", ";
                 }
-                dependantInfo += ")";
-                ctx.fillText("Contains:", 0, 515);
-                ctx.fillText(dependantInfo, 10, 530);
+                resourceData += ")";
+                
+                ctx.fillText(resourceData, 10, 530);
             }
-            
+            if(this.selectedTile.structure != null){
+                let structureData;
+                structureData = this.selectedTile.structure.name + "(";
+                for(let j = 0; j < this.selectedTile.structure.data.length; j++){
+                    structureData += this.selectedTile.structure.data[j].property;
+                    structureData += ": " + this.selectedTile.structure.data[j].value + ", ";
+                }
+                structureData += ")";
+                ctx.fillText(structureData, 10, 545);
+            }
+
         }
-        if(this.buildButton != null) {
-            this.buildButton.render();
+        
+
+        
+        if(this.selectedTile != null && (this.selectedTile.owner == this || this.selectedTile.owner == null)) { 
+            this.selectedTile.ui.forEach(element => {
+                if(element.active)
+                    element.render();
+            })
+            if(this.selectedTile.resource != null) {
+                this.selectedTile.resource.ui.forEach(element => {
+                    if(element.active)
+                        element.render();
+                })
+            }
+            if(this.selectedTile.structure != null) {
+                this.selectedTile.structure.ui.forEach(element => {
+                    if(element.active)
+                        element.render();
+                })
+            }
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
         }
 
     ctx.setTransform(gameCamera.scale, 0, 0, gameCamera.scale, gameCamera.xOffset*gameCamera.scale, gameCamera.yOffset*gameCamera.scale);
@@ -130,9 +168,12 @@ function nextTurn() {
     players[currentPlayer].selectedTile = null;
     currentPlayer = (currentPlayer+1 == players.length)? 0 : currentPlayer+1;
     tileManager.tiles.forEach(element => {
+        if(currentPlayer == 0) {
+            element.onNextTurn();
+        }
         element.selected = false;
     })
-    
+    gameCamera.resetOffset();
 }
 
 function render() {
@@ -153,7 +194,9 @@ function render() {
 }
 
 function tick(){
-    gameCamera.calculateOffset();
+    if(!uiManager.hoveringOverUi){
+        gameCamera.calculateOffset();
+    }
     players[currentPlayer].tick();
     entityManager.tick();
     tileManager.tick();
