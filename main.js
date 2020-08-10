@@ -4,21 +4,19 @@ let tps = 30;
 
 const cvs = document.getElementById('canvas');
 const ctx = cvs.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 const WIDTH = document.getElementById('canvas').width;
 const HEIGHT = document.getElementById('canvas').height;
 
 assets.init();
 
-tileManager.generateMap(10, 10, 10);
 
-tileManager.tiles[0].addResource(new FeildBerries());
-uiManager.add(new UIButton(20, 540, 100, 40, nextTurn));
 
 //GameCamera
 let gameCamera = {
-    xOffset: 500,
+    xOffset: 1000,
     yOffset: 0,
-    scale: 1,
+    scale: 0.5,
     lastX: 0,
     lastY:0,
     calculateOffset: function() {
@@ -51,7 +49,7 @@ cvs.onwheel = function (event){
     let zoomIntensity = 0.2;
     let zoom = Math.exp(wheel*zoomIntensity);
     
-    if(gameCamera.scale * zoom < 3 && gameCamera.scale * zoom > 0.25) {
+    if(gameCamera.scale * zoom < 1 && gameCamera.scale * zoom > 0.25) {
         gameCamera.xOffset += (mousex/(gameCamera.scale*zoom) - mousex/gameCamera.scale);
         gameCamera.yOffset += (mousey/(gameCamera.scale*zoom) - mousey/gameCamera.scale);
         
@@ -110,7 +108,7 @@ class Player {
         ctx.fillText("Hello my name is " + this.name + " and my id is: " + this.id, 0, 15);
         ctx.fillText(`Agricultural Resources: ${this.resources[0]} | Mining Resources: ${this.resources[1]} | Forestry Resources: ${this.resources[2]} | Technological Resources: ${this.resources[3]}`, 0, 30);
         if(this.selectedTile != null) {
-            ctx.fillText(`Selected Tile: ${this.selectedTile.id}, Type: ${this.selectedTile.type}, Owner: ${this.selectedTile.owner == null? "unowned": this.selectedTile.owner.name}`, 0, 500);
+            ctx.fillText(`Selected Tile: (${this.selectedTile.id.x}, ${this.selectedTile.id.y}), Type: ${this.selectedTile.type}, Owner: ${this.selectedTile.owner == null? "unowned": this.selectedTile.owner.name}`, 0, 500);
             ctx.fillText("Contains:", 0, 515);
             if(this.selectedTile.resource != null){
                 let resourceData;
@@ -159,6 +157,10 @@ class Player {
         }
 
     ctx.setTransform(gameCamera.scale, 0, 0, gameCamera.scale, gameCamera.xOffset*gameCamera.scale, gameCamera.yOffset*gameCamera.scale);
+
+    if(this.selectedTile != null) {
+        ctx.drawImage(assets.textures.misc.selected, this.selectedTile.x, this.selectedTile.y, this.selectedTile.width, 58);
+    }
     }
 }
 let currentPlayer = 0;
@@ -168,14 +170,19 @@ function nextTurn() {
     players[currentPlayer].selectedTile = null;
     currentPlayer = (currentPlayer+1 == players.length)? 0 : currentPlayer+1;
     tileManager.tiles.forEach(element => {
-        if(currentPlayer == 0) {
-            element.onNextTurn();
-        }
-        element.selected = false;
+        element.forEach(tile => {
+            if(currentPlayer == 0) {
+                tile.onNextTurn();
+            }
+            tile.selected = false;
+        })
     })
     gameCamera.resetOffset();
 }
+tileManager.generateMap(15, 15, 0.55);
 
+
+uiManager.add(new UIButton(20, 540, 100, 40, nextTurn));
 function render() {
     ctx.clearRect(-10000,-10000,20000,20000);
     

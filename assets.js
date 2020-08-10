@@ -6,8 +6,8 @@ let assets = {
                     berries_1: new Image(),
                     foraging_1: new Image(),
                     init: function() {
-                        this.berries_1.src = 'res/textures/entity_static_fields_berries_1.gif';
-                        this.foraging_1.src = 'res/textures/entity_static_fields_foraging_1.gif';
+                        this.berries_1.src = 'res/textures/entity_static_fields_berries_1.png';
+                        this.foraging_1.src = 'res/textures/entity_static_fields_foraging_1.png';
                     }
                 },
                 init: function() {
@@ -26,16 +26,18 @@ let assets = {
         },
         tile: {
             field: new Image(),
+            water: new Image(),
             init: function() {
-                this.field.src = 'res/textures/tile_field.gif';
+                this.field.src = 'res/textures/tile_field.png';
+                this.water.src = 'res/textures/tile_water.png';
             }
         },
         misc: {
             unknown: new Image(),
-            base: new Image(),
+            selected: new Image(),
             init: function() {
-                this.unknown.src = 'res/textures/misc_unknown.gif';
-                this.base.src = 'res/textures/misc_base.gif';
+                this.unknown.src = 'res/textures/misc_unknown.png';
+                this.selected.src = 'res/textures/misc_selected.png';
             }
         },
         init: function() {

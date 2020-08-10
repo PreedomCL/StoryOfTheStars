@@ -1,5 +1,4 @@
-let base = new Image();
-base.src = '/res/textures/misc_base.gif';
+
 
 let entityManager = {
     entities: [],
@@ -143,7 +142,7 @@ class Structure extends StaticEntity {
     }
 
     onNextTurn() {
-
+        
     }
 }
 
